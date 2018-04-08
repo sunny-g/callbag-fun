@@ -169,9 +169,21 @@ const multiplyBy = factor => inputSource => {
   };
 };
 
+const tap = tapFn => inputSource => {
+  return function tapSource(start, sink) {
+    if (start !== 0) { return; }
+
+    inputSource(0, function tapSink(type, data) {
+      tapFn(type, data);
+      sink(type, data);
+    });
+  };
+};
+
 pipe(
   pullable.firstN(10),
   multiplyBy(2),
   multiplyBy(2),
+  tap((t, d) => console.log('tapping:', t, d)),
   log,
 );
